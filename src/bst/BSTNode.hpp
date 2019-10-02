@@ -13,10 +13,17 @@ class BSTNode {
     BSTNode<Data>* parent;
     Data const data;  // the const Data in this node.
 
-    /** TODO */
+    /** Constructor.
+     * Initialize a BSTNode with given Data, with no parent and no children.
+     * @param d Data/element of this node.
+     */
     BSTNode(const Data& d) : data(d) {}
 
-    /** TODO */
+    /** Returns the successor of this BSTNode.
+     * The successor is the node with the smallest element that is larger than
+     * this node's.
+     * @return Successor node or nullptr
+     */
     BSTNode<Data>* successor() { return 0; }
 };
 
