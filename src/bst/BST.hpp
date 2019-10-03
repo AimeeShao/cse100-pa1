@@ -27,39 +27,143 @@ class BST {
      */
     BST() : root(0), isize(0), iheight(-1) {}
 
-    /** TODO */
+    /** Deconstructor.
+     *  Deletes the pointer to the root after deleting the rest of the nodes.
+     */
     virtual ~BST() { deleteAll(root); }
 
-    /** TODO */
-    virtual bool insert(const Data& item) { return false; }
+    /** Inserts a new BSTNode containing given Data into the tree in the correct
+     *  order.
+     *  @param item Data to insert into a BSTNode that will go in the tree
+     *  @return True if successfully inserted. False if duplicate insertion
+     *          or otherwise.
+     */
+    virtual bool insert(const Data& item) {
+        // create new node with item
+        BSTNode<Data>* node = new BSTNode<Data>(item);
+        int height = 0;  // keep track of height as we go down BST
 
-    /** TODO */
-    virtual iterator find(const Data& item) const { return 0; }
+        // no root, then new node is root
+        if (root == nullptr) {
+            root = node;
+            ++isize;
+            iheight = height;
+            return true;
+        }
 
-    /** TODO */
-    unsigned int size() const { return 0; }
+        BSTNode<Data>* curr = root;     // start with root node
+        BSTNode<Data>* prev = nullptr;  // holds previous node so we can assign
 
-    /** TODO */
-    int height() const { return 0; }
+        while (curr != nullptr) {  // loop till we find a spot for new node
+            prev = curr;
+            ++height;
+            if (item < curr->data) {  // go left
+                curr = curr->left;
+            } else if (curr->data < item) {  // go right
+                curr = curr->right;
+            } else {  // duplicate insertion
+                return false;
+            }
+        }
+        // found spot for new node
+        if (item < prev->data) {
+            prev->left = node;
+            node->parent = prev;
+        } else if (prev->data < item) {
+            prev->right = node;
+            node->parent = prev;
+        }
 
-    /** TODO */
-    bool empty() const { return false; }
+        // increase height if we added a new level
+        if (iheight < height) {
+            iheight = height;
+        }
+        ++isize;  // added a node, so increment size
 
-    /** TODO */
+        return true;
+    }
+
+    /** Find a Data item in the BST. Return iterator pointing to that item or
+     *  past the last node in BST if not found.
+     *  @param item Data to be found in BST
+     *  @return iterator pointing to node with data or nullptr if not found.
+     */
+    virtual iterator find(const Data& item) const {
+        BSTNode<Data>* curr = root;  // used to traverse BST
+
+        while (curr != nullptr) {     // loop till we reach end or find item
+            if (item < curr->data) {  // go left
+                curr = curr->left;
+            } else if (curr->data < item) {  // go right
+                curr = curr->right;
+            } else {  // found item
+                break;
+            }
+        }
+
+        return iterator(curr);
+    }
+
+    /** Returns the number of items currently in BST.
+     *  @return Number of items in BST.
+     */
+    unsigned int size() const { return isize; }
+
+    /** Returns the height of BST.
+     *  @return Height of BST
+     */
+    int height() const { return iheight; }
+
+    /** Returns if BST is empty or not with 0 items.
+     *  @return True if BST is empty. False otherwise.
+     */
+    bool empty() const { return (isize == 0 && root == nullptr); }
+
+    /** Return an iterator pointing to root of the BST by calling first.
+     *  @return Iterator pointing to root of BST.
+     */
     iterator begin() const { return BST::iterator(first(root)); }
 
     /** Return an iterator pointing past the last item in the BST.
+     *  @return Iterator pointing to end of BST, past last time.
      */
     iterator end() const { return typename BST<Data>::iterator(0); }
 
-    /** TODO */
-    vector<Data> inorder() const {}
+    /** Perform in order traversal through BST and return the order as vector.
+     *  @return Vector that contains data of BST in order from smallest to
+     *          largest.
+     */
+    vector<Data> inorder() const {
+        vector<Data> order{};
+        iterator iter = begin();  // start from smallest element and iterate
+        while (iter != end()) {   // stop when we reach end of BST
+            order.push_back(*iter);
+            ++iter;
+        }
+        return order;
+    }
 
   private:
-    /** TODO */
-    static BSTNode<Data>* first(BSTNode<Data>* root) { return 0; }
+    /** Returns the smallest or first element of BST.
+     *  @param root Root in BST
+     *  @return BSTNode * to smallest element in BST
+     */
+    static BSTNode<Data>* first(BSTNode<Data>* root) {
+        if (root == nullptr) {  // empty tree check
+            return 0;
+        }
 
-    /** TODO */
+        BSTNode<Data>* curr = root;
+        while (curr->left != nullptr) {  // keep going left until cant anymore
+            curr = curr->left;
+        }
+
+        return curr;
+    }
+
+    /** Deletes all the nodes below given node in BST.
+     *  @param n Node to start deleting nodes from
+     */
     static void deleteAll(BSTNode<Data>* n) {
         /* Pseudocode:
            if current node is null: return;
@@ -67,6 +171,12 @@ class BST {
            recursively delete right sub-tree
            delete current node
         */
+        if (n == nullptr) {
+            return;
+        }
+        deleteAll(n->left);
+        deleteAll(n->right);
+        delete (n);
     }
 };
 
