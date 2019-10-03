@@ -38,17 +38,15 @@ class BSTNode {
             // go up until current is a left child
             while (current->parent != nullptr) {
                 if (current->parent->left == current) {
-                    return current
-                        ->parent;  // if left child, parent is successor
-                } else {           // keep going up
+                    // if left child, parent is successor
+                    return current->parent;
+                } else {  // keep going up
                     current = current->parent;
                 }
             }
 
             // never found parent successor, no successor
-            if (current->parent == nullptr) return 0;
-
-            return current;
+            return 0;
         }
     }
 };
