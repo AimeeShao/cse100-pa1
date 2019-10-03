@@ -20,6 +20,13 @@ TEST(BST_NODE_TESTS, TEST_INITIALIZATION) {
     ASSERT_EQ(node.parent, nullptr);
 }
 
+TEST(BST_NODE_TESTS, TEST_INITIALIZATION_HEAP) {
+    BSTNode<int>* node = new BSTNode<int>(3);
+    ASSERT_EQ(node->data, 3);
+    // assert node on heap works
+    delete (node);
+}
+
 /* Successor test starts here */
 // No Successor
 TEST(BST_NODE_TESTS, TEST_SUCCESSOR) {
