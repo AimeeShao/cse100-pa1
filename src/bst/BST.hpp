@@ -61,7 +61,8 @@ class BST {
                 curr = curr->left;
             } else if (curr->data < item) {  // go right
                 curr = curr->right;
-            } else {  // duplicate insertion
+            } else {            // duplicate insertion
+                delete (node);  // delete heap item before returning
                 return false;
             }
         }
