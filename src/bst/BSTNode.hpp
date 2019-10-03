@@ -17,14 +17,40 @@ class BSTNode {
      * Initialize a BSTNode with given Data, with no parent and no children.
      * @param d Data/element of this node.
      */
-    BSTNode(const Data& d) : data(d) {}
+    BSTNode(const Data& d) : data(d) { left = right = parent = nullptr; }
 
     /** Returns the successor of this BSTNode.
      * The successor is the node with the smallest element that is larger than
      * this node's.
      * @return Successor node or nullptr
      */
-    BSTNode<Data>* successor() { return 0; }
+    BSTNode<Data>* successor() {
+        // has a right subtree, successor is leftmost node in right subtree
+        if (right != nullptr) {
+            BSTNode<Data>* current = right;
+            // traverse right subtree;
+            while (current->left != nullptr) {
+                current = current->left;
+            }
+            return current;
+        } else {  // no right child
+            BSTNode<Data>* current = this;
+            // go up until current is a left child
+            while (current->parent != nullptr) {
+                if (current->parent->left == current) {
+                    return current
+                        ->parent;  // if left child, parent is successor
+                } else {           // keep going up
+                    current = current->parent;
+                }
+            }
+
+            // never found parent successor, no successor
+            if (current->parent == nullptr) return 0;
+
+            return current;
+        }
+    }
 };
 
 /** DO NOT CHANGE THIS METHOD
