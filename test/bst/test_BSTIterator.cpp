@@ -29,12 +29,13 @@ TEST(BST_ITERATOR_TEST, TEST_ITERATOR_EQUALITY) {
     BSTNode<int> node1(3);
     BSTIterator<int> iter1(&node1);
     BSTIterator<int> iter2(&node1);
-
-    ASSERT_EQ(iter1 == iter2, true);
+    // assert true iterator equality
+    ASSERT_TRUE(iter1 == iter2);
 
     BSTNode<int> node2(3);
     iter2 = BSTIterator<int>(&node2);
-    ASSERT_EQ(iter1 == iter2, false);
+    // assert false iterator inequality
+    ASSERT_FALSE(iter1 == iter2);
 }
 
 /* Inquality test */
@@ -43,11 +44,13 @@ TEST(BST_ITERATOR_TEST, TEST_ITERATOR_INEQUALITY) {
     BSTIterator<int> iter1(&node1);
     BSTIterator<int> iter2(&node1);
 
-    ASSERT_EQ(iter1 != iter2, false);
+    // assert false iterator inequality, they are equal
+    ASSERT_FALSE(iter1 != iter2);
 
     BSTNode<int> node2(5);
     iter2 = BSTIterator<int>(&node2);
-    ASSERT_EQ(iter1 != iter2, true);
+    // assert true iterator inequality
+    ASSERT_TRUE(iter1 != iter2);
 }
 
 /* Dereference test */
