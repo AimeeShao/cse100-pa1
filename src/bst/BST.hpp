@@ -136,7 +136,8 @@ class BST {
     vector<Data> inorder() const {
         vector<Data> order{};
         iterator iter = begin();  // start from smallest element and iterate
-        while (iter != end()) {   // stop when we reach end of BST
+        iterator end = end();
+        while (iter != end) {  // stop when we reach end of BST
             order.push_back(*iter);
             ++iter;
         }
