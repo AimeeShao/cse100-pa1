@@ -55,5 +55,5 @@ TEST(BST_ITERATOR_TEST, TEST_DEREFERENCE) {
     BSTNode<int> node(1);
     BSTIterator<int> iter(&node);
 
-    ASSERT_EQ(*iter = node.data);
+    ASSERT_EQ(*iter, node.data);
 }
