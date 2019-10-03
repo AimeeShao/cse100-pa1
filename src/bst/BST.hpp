@@ -39,17 +39,17 @@ class BST {
      *          or otherwise.
      */
     virtual bool insert(const Data& item) {
+        // create new node with item
+        BSTNode<Data>* node = new BSTNode<Data>(item);
+        int height = 0;  // keep track of height as we go down BST
+
         // no root, then new node is root
         if (root == nullptr) {
             root = node;
             ++isize;
-            iheight = 0;
+            iheight = height;
             return true;
         }
-
-        // create new node with item
-        BSTNode<Data>* node = new BSTNode<Data>(item);
-        int height = 0;  // keep track of height as we go down BST
 
         BSTNode<Data>* curr = root;     // start with root node
         BSTNode<Data>* prev = nullptr;  // holds previous node so we can assign
