@@ -148,3 +148,16 @@ TEST_F(LargeKDTFixture, TEST_LARGE_NEAREST_POINT) {
     Point* closestPoint = naiveSearch.findNearestNeighbor(queryPoint);
     ASSERT_EQ(*kdt.findNearestNeighbor(queryPoint), *closestPoint);
 }
+
+TEST_F(LargeKDTFixture, TEST_RANGE_SEARCH) {
+    // Assert range search is correct
+    vector<pair<double, double>> queryRegion;
+    queryRegion.emplace_back(make_pair(3, 6));
+    queryRegion.emplace_back(make_pair(3, 6));
+
+    vector<Point> answer;
+    answer.emplace_back(Point({4, 3}));
+    answer.emplace_back(Point({6, 6}));
+    kdt.rangeSearch(queryRegion);
+    ASSERT_EQ(kdt.rangeSearch(queryRegion), answer);
+}
