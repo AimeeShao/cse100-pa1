@@ -85,6 +85,21 @@ class KDT {
             buildSubtree(points, start, medianIndex, 1 % numDim, height);
         root->right =
             buildSubtree(points, medianIndex + 1, end, 1 % numDim, height);
+
+        // extra credit
+        // set boundingBox as smallest box containing all points
+        for (unsigned int i = 0; i < numDim; i++) {
+            double lowerBound = numeric_limits<double>::min();
+            double upperBound = numeric_limits<double>::max();
+            for (Point p : points) {
+                if (p.valueAt(i) < lowerBound)
+                    lowerBound = p.valueAt(i);
+                else if (p.valueAt(i) > upperBound)
+                    upperBound = p.valueAt(i);
+            }
+            // add boundary pair to boundingBox
+            boundingBox.emplace_back(make_pair(lowerBound, upperBound));
+        }
     }
 
     /** Returns a pointer to the nearest neighbor of a given query point in the
@@ -113,9 +128,11 @@ class KDT {
      *  @return Vector of all points inside query region
      */
     vector<Point> rangeSearch(vector<pair<double, double>>& queryRegion) {
-        vector<Point> currBB;
-        rangeSearchHelper(root, currBB, queryRegion, 0);
-        return currBB;
+        // reset pointsInRange before new search
+        pointsInRange = {};
+        // call helper function
+        rangeSearchHelper(root, boundingBox, queryRegion, 0);
+        return pointsInRange;
     }
 
     /** Returns the size of the KDT. This is the number of items in the tree.
@@ -186,7 +203,7 @@ class KDT {
         int nodeVal = node->point.valueAt(curDim);
         int queryVal = queryPoint.valueAt(curDim);
 
-        int nextDim = (curDim + 1) % numDim;  // next dimension to compare
+        unsigned int nextDim = (curDim + 1) % numDim;  // next dimension
 
         // if query larger than or equal to node, go right first
         if (nodeVal <= queryVal) {
@@ -230,43 +247,94 @@ class KDT {
         if (node == nullptr) {
             return;
         }
+        /*
+        // if curBB is disjoint from queryRegion, stop looking in this tree
+        bool disjoint = true;
+        // if curBB is a subset of queryRegion, just add all points in curBB
+        bool subset = true;
 
-        int nodeValue = node->point.valueAt(curDim);  // value of node at curDim
-        int nextDim = (curDim + 1) % numDim;          // next dimension
-
-        // if curDim node value < queryLower, go right
-        if (nodeValue < queryRegion[curDim][0]) {
-            rangeSearchHelper(node->right, currBB, queryRegion, nextDim);
-        }
-        // if queryUpper < curDim node value, go left
-        if (queryRegion[curDim][1] < nodeValue) {
-            rangeSearchHelper(node->left, currBB, queryRegion, nextDim);
-        }
-        // if curDim node value is in between (inclusive) range, then go both
-        if (queryRegion[curDim][0] < nodeValue &&
-            nodeValue < queryRegion[curDim][1]) {
-            rangeSearchHelper(node->right, currBB, queryRegion, nextDim);
-            rangeSearchHelper(node->left, currBB, queryRegion, nextDim);
-
-            // check if other dimensions falls in query region
-            for (int i = nextDim; i != curDim; i = (i + 1) % nextDim) {
-            }
-        }
-
-        /** Deletes every node in the KDT.
-         *  @param n Node to delete subtree of and the node itself.
-         */
-        static void deleteAll(KDNode * n) {
-            // base case
-            if (n == nullptr) {
+        for (int i = 0; i < numDim; i++) {  // loop through curBB dimensions
+            if (queryRegion[i][0] < curBB[i][0] &&
+                curBB[i][1] < queryRegion[i][1]) {  // subset
+                addSubset(node);
                 return;
             }
+            if (queryRegion[i][0])
+        }
+        // if disjoint is still true, return
+        if (disjoint) {
+            return;
+        }
+        // if subset, add all points and return
+        if (subset) {
+          addSubset(node);
+          return;
+        }
+*/
+        int nodeValue = node->point.valueAt(curDim);  // value of node at curDim
+        unsigned int nextDim = (curDim + 1) % numDim;  // next dimension
 
-            deleteAll(n->left);
-            deleteAll(n->right);
-            delete (n);
+        // if curDim node value < queryLower, go right
+        if (nodeValue < queryRegion[curDim].first) {
+            rangeSearchHelper(node->right, curBB, queryRegion, nextDim);
+
+        } else if (queryRegion[curDim].second < nodeValue) {
+            // if queryUpper < curDim node value, go left
+            rangeSearchHelper(node->left, curBB, queryRegion, nextDim);
+
+        } else {  // nodeValue is between (inclusive) range, go both left right
+            rangeSearchHelper(node->right, curBB, queryRegion, nextDim);
+            rangeSearchHelper(node->left, curBB, queryRegion, nextDim);
+
+            bool inRange = true;  // if current node's point is in region
+
+            // check if other dimensions fall in query region
+            for (unsigned int dim = nextDim; dim != curDim;
+                 dim = (dim + 1) % numDim) {
+                int curVal = node->point.valueAt(dim);
+                if (curVal < queryRegion[dim].first ||
+                    queryRegion[dim].second < curVal) {  // if out of range
+                    inRange = false;
+                    break;
+                }
+            }
+
+            // add node if in region
+            if (inRange) {
+                pointsInRange.emplace_back(node->point);
+            }
+        }
+    }
+
+    /** Deletes every node in the KDT.
+     *  @param n Node to delete subtree of and the node itself.
+     */
+    static void deleteAll(KDNode* n) {
+        // base case
+        if (n == nullptr) {
+            return;
         }
 
-        // Add your own helper methods here
-    };
+        deleteAll(n->left);
+        deleteAll(n->right);
+        delete (n);
+    }
+
+    // Add your own helper methods here
+    /**
+     * Used for extra credit. Add node and all children nodes to
+     * pointsInRange.
+     * @param n Pointer to node to add to pointsInRange
+     */
+    void addSubset(KDNode* n) {
+        // base case
+        if (n == nullptr) {
+            return;
+        }
+
+        pointsInRange.emplace_back(n->point);
+        addSubset(n->left);
+        addSubset(n->right);
+    }
+};
 #endif  // KDT_HPP
