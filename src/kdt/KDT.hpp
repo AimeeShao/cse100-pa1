@@ -86,16 +86,14 @@ class KDT {
         root->right =
             buildSubtree(points, medianIndex + 1, end, 1 % numDim, height);
 
-        // extra credit
+        // extra credit - bounding box not used however.
         // set boundingBox as smallest box containing all points
         for (unsigned int i = 0; i < numDim; i++) {
-            double lowerBound = numeric_limits<double>::min();
-            double upperBound = numeric_limits<double>::max();
+            double lowerBound = numeric_limits<double>::max();
+            double upperBound = numeric_limits<double>::min();
             for (Point p : points) {
-                if (p.valueAt(i) < lowerBound)
-                    lowerBound = p.valueAt(i);
-                else if (p.valueAt(i) > upperBound)
-                    upperBound = p.valueAt(i);
+                if (p.valueAt(i) < lowerBound) lowerBound = p.valueAt(i);
+                if (p.valueAt(i) > upperBound) upperBound = p.valueAt(i);
             }
             // add boundary pair to boundingBox
             boundingBox.emplace_back(make_pair(lowerBound, upperBound));
@@ -247,30 +245,7 @@ class KDT {
         if (node == nullptr) {
             return;
         }
-        /*
-        // if curBB is disjoint from queryRegion, stop looking in this tree
-        bool disjoint = true;
-        // if curBB is a subset of queryRegion, just add all points in curBB
-        bool subset = true;
 
-        for (int i = 0; i < numDim; i++) {  // loop through curBB dimensions
-            if (queryRegion[i][0] < curBB[i][0] &&
-                curBB[i][1] < queryRegion[i][1]) {  // subset
-                addSubset(node);
-                return;
-            }
-            if (queryRegion[i][0])
-        }
-        // if disjoint is still true, return
-        if (disjoint) {
-            return;
-        }
-        // if subset, add all points and return
-        if (subset) {
-          addSubset(node);
-          return;
-        }
-*/
         int nodeValue = node->point.valueAt(curDim);  // value of node at curDim
         unsigned int nextDim = (curDim + 1) % numDim;  // next dimension
 
@@ -321,20 +296,5 @@ class KDT {
     }
 
     // Add your own helper methods here
-    /**
-     * Used for extra credit. Add node and all children nodes to
-     * pointsInRange.
-     * @param n Pointer to node to add to pointsInRange
-     */
-    void addSubset(KDNode* n) {
-        // base case
-        if (n == nullptr) {
-            return;
-        }
-
-        pointsInRange.emplace_back(n->point);
-        addSubset(n->left);
-        addSubset(n->right);
-    }
 };
 #endif  // KDT_HPP
