@@ -198,8 +198,8 @@ class KDT {
         }
 
         // values of curDim to compare
-        int nodeVal = node->point.valueAt(curDim);
-        int queryVal = queryPoint.valueAt(curDim);
+        double nodeVal = node->point.valueAt(curDim);
+        double queryVal = queryPoint.valueAt(curDim);
 
         unsigned int nextDim = (curDim + 1) % numDim;  // next dimension
 
@@ -246,7 +246,8 @@ class KDT {
             return;
         }
 
-        int nodeValue = node->point.valueAt(curDim);  // value of node at curDim
+        double nodeValue =
+            node->point.valueAt(curDim);  // value of node at curDim
         unsigned int nextDim = (curDim + 1) % numDim;  // next dimension
 
         // if curDim node value < queryLower, go right
@@ -266,7 +267,7 @@ class KDT {
             // check if other dimensions fall in query region
             for (unsigned int dim = nextDim; dim != curDim;
                  dim = (dim + 1) % numDim) {
-                int curVal = node->point.valueAt(dim);
+                double curVal = node->point.valueAt(dim);
                 if (curVal < queryRegion[dim].first ||
                     queryRegion[dim].second < curVal) {  // if out of range
                     inRange = false;
